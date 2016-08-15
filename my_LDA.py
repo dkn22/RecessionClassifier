@@ -55,21 +55,26 @@ class hLDA(object):
 		for n, w in enumerate(DocTermMatrix.word_index(dtm[0,:])):
 			draw = hLDA.roll_die_first_doc()
 			if draw is not None and draw <= self.k:
-				z[(0,n+1)] = sample[draw]
-				local_count[0, sample[draw]] += 1
+				z[(0,n+1)] = draw
+				local_count[0, draw] += 1
 			elif draw > self.k and draw <= 2*self.k:
-				new_s = sample[draw - self.k] # assign the s_{Mn+1} = s
-				sample.append(new_s)
-				# update local_count?
-				local_count[0, sample[draw]] += 1
+				sample[M+1] = draw - self.k # assign the s_{Mn+1} = s
+
+				# update local and global count?
+				local_count[0, sample[M+1]] += 1
+				global_count[0, sample[M+1]] += 1
+
 				M += 1
 				# set z_{n+1} equal to?
+				z[(0, n+1)] = sample[M+1]
 			elif draw > 2*self.k:
 				new_s = multinomial(1,[1/self.k]*self.k).nonzero()[0][0]
-				sample.append(new_s)
+				sample[M+1] = new_s
 				M += 1
 				global_count[0, new_s] += 1
+				local_count[0, new_s] += 1
 				# set z_{n+1} equal to?
+				z[(0, n+1)] = new_s
 			R = set(sample)
 
 		# hierarchical prior across documnents
@@ -93,9 +98,10 @@ class hLDA(object):
 						local_count[idx, draw] += 1
 					else:
 						sample[M+1] = multinomial(1,[1/self.k]*self.k).nonzero()[0][0]
-						z[(idx,n)] = sample[M+1]
+						z[(idx,n+1)] = sample[M+1]
 						global_count[idx, sample[M+1]] += 1
 						local_count[idx, sample[M+1]] += 1
+						M += 1
 
 
 
@@ -183,8 +189,8 @@ class DocTermMatrix(object):
 		"""
 		# doc_row = np.array(doc_row)
 		for idx in doc_row.nonzero()[0]:
-        		for i in range(int(doc_row[idx])):
-            			yield idx
+        	for i in range(int(doc_row[idx])):
+            	yield idx
 
 ### 2. The LDA class including both uncollapsed and collapsed Gibbs sampler ###
 
