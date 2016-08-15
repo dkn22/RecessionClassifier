@@ -183,8 +183,8 @@ class DocTermMatrix(object):
 		"""
 		# doc_row = np.array(doc_row)
 		for idx in doc_row.nonzero()[0]:
-        	for i in range(int(doc_row[idx])):
-            	yield idx
+        		for i in range(int(doc_row[idx])):
+            			yield idx
 
 ### 2. The LDA class including both uncollapsed and collapsed Gibbs sampler ###
 
