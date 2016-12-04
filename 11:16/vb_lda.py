@@ -64,9 +64,10 @@ class lda(object):
 		max_iter = 10, 
 		convergence_thres = 1e-3,
 		gamma_max_iter = 10,
-		convergence_criterion = 1e-3):
+		convergence_criterion = 1e-3,
+		**kwargs):
 
-		docs, vocab = parser._parse_vocab(corpus)
+		docs, vocab = parser._parse_vocab(corpus, **kwargs)
 		print('Created the vocabulary. # terms:', len(vocab.keys()))
 
 		# store the vocabulary as a dictionary to access word strings
@@ -135,6 +136,7 @@ class lda(object):
 		# keep phid KxV because we will later use it 
 		# to update lambda which is also KxV
 		phi_over_all_d = np.zeros((self.num_topics, self.vocab_size)) # KxV
+		# phi_over_all_d = np.zeros((self.vocab_size, self.num_topics)) # VxK
 
 		# expectation of log beta under the variational Dirichlet (p. 10)
 		# E_log_beta = psi(lambda) - psi(np.sum(lambda, axis=1))
@@ -146,7 +148,7 @@ class lda(object):
 			term_ids = np.array(doc_term_ids[d], dtype=np.int)
 
 			# Term counts (for each unique term) in document d
-			term_counts = np.array(doc_term_counts[d])
+			term_counts = np.array(doc_term_counts[d], dtype=np.int)
 
 			# Number of unique terms in document d
 			total_term_count = len(term_ids)
@@ -190,6 +192,7 @@ class lda(object):
 			self._gamma[d, :] = gammad
 
 			phi_over_all_d[:, term_ids] += np.exp(log_phid + np.log( term_counts.reshape(-1, 1) ) ).T;
+			# phi_over_all_d[term_ids, :] += np.exp(log_phid + np.log( term_counts.reshape(-1, 1) ) )
 
 			# NOTE: terms involving psi(gamma) get cancelled
 			# because gammad = alpha + \sum_n(phi_dn)
@@ -211,6 +214,7 @@ class lda(object):
 		'''
 
 		self._lambda = self.eta + phi_over_all_d;
+		# self._lambda = self.eta + phi_over_all_d.T
 
 		elbo = elbo_without_beta
 
