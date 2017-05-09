@@ -36,9 +36,9 @@ class Parser(object):
 			stop_words = set(stopwords.words('english'))
 
 		stop_words.update(['.', ',', '"', "'", '?', '!', 
-			':', ';', '(', ')', '[', ']',
-			'{', '}', '..', '...', '--', '', '/',
-			"/'s", "'s", "$", "``"])
+			':', ';', '(', ')', '[', ']', '&',
+			'{', '}', '..', '...', '--', '', '/', "''",
+			"/'s", "'s", "$", "``", "`", "c", "s"])
 		stop_words.update(['january', 'february',
 			'march', 'april', 'may', 'june',
 			'july', 'august', 'september',
@@ -63,6 +63,7 @@ class Parser(object):
 				raw = self.replace_ngrams(raw, replace_dict)
 
 			token_list = word_tokenize(raw)
+			token_list = [word for word in token_list if word not in stop_words]
 			words = (punctuation.sub("", word).strip() for word in token_list if not word.startswith('m'))
 			tokens = [word for word in words if word not in stop_words]
 

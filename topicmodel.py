@@ -11,7 +11,6 @@ import time
 # import parser
 from utils import *
 import warnings
-np.random.seed(0)
 
 
 class LDA(object):
@@ -28,7 +27,8 @@ class LDA(object):
     '''
 
 # 1. Initialization
-    def __init__(self, K, alpha=0.1, eta=0.01, optimize_hyperparam=True):
+    def __init__(self, K, alpha=0.1, eta=0.01, optimize_hyperparam=True,
+        ):
         # assert len(alpha) == K or len(list(alpha)) == 1;
         # if len(alpha)==K else alpha*np.ones(self.num_topics);
         self.alpha = alpha
@@ -54,9 +54,9 @@ class LDA(object):
         # assert len(self.eta) == self.vocab_size
         self.eta = self.eta + np.zeros(self.vocab_size)
 
-        self._gamma = (1/self.num_topics) * np.ones((self.num_docs, self.num_topics))
-        # self._gamma = np.random.gamma(100., 1. / 100.,
-        #                               (self.num_docs, self.num_topics))
+        # self._gamma = (1/self.num_topics) * np.ones((self.num_docs, self.num_topics))
+        self._gamma = np.random.gamma(100., 1. / 100.,
+                                       (self.num_docs, self.num_topics))
 
         self._lambda = np.random.gamma(100., 1. / 100.,
                                        (self.num_topics, self.vocab_size))
@@ -148,7 +148,7 @@ class LDA(object):
 
         return self.theta, self.beta, elbo  # , phi_over_all_d
 
-    def fit_multiple_runs(self, corpus, vocab, n_runs=5,
+    def fit_multiple_runs(self, corpus, vocab, n_runs=10,
             **kwargs):
         '''
         Fit several LDA models with random initializations
@@ -338,7 +338,7 @@ class LDA(object):
 
             # Hessian = diag(h) + 1z1^T
             # h is a k-dimensional vector
-            h = - self.num_docs * psi(self.alpha)
+            h = -self.num_docs * polygamma(1, self.alpha)
             z = self.num_docs * polygamma(1, alpha_sum)
 
             # float division
@@ -349,7 +349,7 @@ class LDA(object):
 
             # decrease the update to avoid numerical instability issues
             while any(self.alpha - step_size * alpha_update < 0):
-                step_size = step_size * 0.7
+                step_size = step_size * 0.9
 
             alpha_new = self.alpha - step_size * alpha_update
 
@@ -386,9 +386,9 @@ class LDA(object):
             alpha_sum = np.sum(alpha)
             dim = alpha.shape[0]
 
-            hessian = -np.ones((dim, dim)) * polygamma(1, alpha_sum)
+            hessian = num_docs * np.ones((dim, dim)) * polygamma(1, alpha_sum)
 
-            diagonal = num_docs * polygamma(1, alpha) - polygamma(1, alpha_sum)
+            diagonal = -num_docs*(polygamma(1, alpha) + polygamma(1, alpha_sum))
             diag_idx = np.diag_indices(dim)
             hessian[diag_idx] = diagonal
 
