@@ -86,6 +86,8 @@ def correlate_AUCs(AUC_A, AUC_B, pred_proba_A, pred_proba_B, pos_class_idx):
         pred_proba_B = np.array(pred_proba_B.as_data_frame())
     except Exception:
         pass
+    pred_proba_A = np.array(pred_proba_A)
+    pred_proba_B = np.array(pred_proba_B)
     
     pos_class_scores_A = pred_proba_A[pos_class_idx]
     pos_class_scores_B = pred_proba_B[pos_class_idx]
