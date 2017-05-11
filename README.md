@@ -17,4 +17,4 @@ The data used to produce visualizations and classification output can be found i
 
 
 
-The stored latent variables can be found in the "Stored Latents" variables; these were used to obtain the *exact* results reported in the Jupyter notebooks.
+The stored latent variables can be found in the "Stored Latents" folder; these were used to obtain the *exact* results reported in the Jupyter notebooks.
