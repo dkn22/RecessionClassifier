@@ -2,7 +2,7 @@
 
 An implementation of latent Dirichlet allocation with variational inference, hyperparameter optimization, selection of K through cross-validation. The algorithm was used to predict US recessions from monetary policy texts. My research shows the algorithm is predictive up to a quarter and accuracy can be as high as 90% or more, if we augment topic features with macroeconomic indices.
 
-Thesis can be found [here][https://dkn22.github.io/ds/thesis.pdf].
+Thesis can be found [here](https://dkn22.github.io/ds/thesis.pdf).
 
 
 - preprocess.py: a Parser class to pre-process text
